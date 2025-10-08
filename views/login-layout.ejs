@@ -2,20 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title><%= title || "AdminLTE" %></title>
+  <title><%= title || "Login" %></title>
   <link rel="stylesheet" href="/dist/css/adminlte.min.css">
   <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
 </head>
-<body class="hold-transition sidebar-mini">
-  <div class="wrapper">
-    <%- include('partials/navbar') %>
-    <%- include('partials/sidebar') %>
-
+<body class="hold-transition login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <a href="/"><b>SMART</b>HR+</a>
+    </div>
+    <!-- /.login-logo -->
     <%- body %>
   </div>
+  <!-- /.login-box -->
 
   <script src="/plugins/jquery/jquery.min.js"></script>
   <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="/dist/js/adminlte.min.js"></script>
+  <script>
+    // Make CSRF token available globally
+    <% if (typeof csrfToken !== 'undefined') { %>
+    window.csrfToken = '<%= csrfToken %>';
+    <% } %>
+  </script>
 </body>
 </html>

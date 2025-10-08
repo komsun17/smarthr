@@ -1,0 +1,70 @@
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">New Feature</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/dashboard">Home</a></li>
+                        <li class="breadcrumb-item active">New Feature</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">New Feature System</h3>
+                </div>
+                <div class="card-body">
+                    <p>ฟีเจอร์ใหม่ - ยังไม่พร้อมใช้งาน</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+                <%= error %>
+            </div>
+            <% } %>
+
+            <!-- Main Card -->
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">New Feature System</h3>
+                </div>
+                
+                <form action="/new-feature" method="post">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="inputField">Input Data:</label>
+                            <input type="text" class="form-control" id="inputField" name="inputField" required>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Results Display -->
+            <% if (typeof data !== 'undefined') { %>
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h3 class="card-title">Results</h3>
+                </div>
+                <div class="card-body">
+                    <pre><%= JSON.stringify(data, null, 2) %></pre>
+                </div>
+            </div>
+            <% } %>
+        </div>
+    </section>
+</div>

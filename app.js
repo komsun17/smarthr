@@ -8,7 +8,7 @@ const webRoutes = require('./routes/web');
 const MySQLStore = require('express-mysql-session')(session);
 const helmet = require('helmet');
 const csurf = require('csurf');
-const rateLimit = require('express-rate-limit');
+const flash = require('connect-flash');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,15 +36,6 @@ app.use(helmet({
   }
 }));
 
-// ใช้ rate limiter สำหรับทุก request
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 นาที
-  max: 100, // จำกัด 100 requests ต่อ 15 นาที ต่อ IP
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use(limiter);
-
 // view engine
 const VIEW_ENGINE = process.env.VIEW_ENGINE || "ejs";
 app.set("view engine", VIEW_ENGINE);
@@ -55,6 +46,7 @@ app.set("layout", "layout");
 // static files
 const STATIC_PATH = process.env.STATIC_PATH || "public";
 app.use(express.static(path.join(__dirname, STATIC_PATH)));
+app.use(express.static('public'));
 
 // parse form data
 app.use(express.urlencoded({ extended: true }));
@@ -80,6 +72,17 @@ app.use(session({
   }
 }));
 
+// เพิ่ม flash messages
+app.use(flash());
+
+// Middleware สำหรับส่ง flash messages ไปยัง views
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    res.locals.csrfToken = req.csrfToken ? req.csrfToken() : '';
+    next();
+});
+
 // API routes (ไม่ต้องใช้ csurf)
 app.use('/api/auth', authApiRoutes);
 
@@ -89,20 +92,19 @@ app.use('/', csurf(), (req, res, next) => {
   next();
 }, webRoutes);
 
-// start server
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
-
-// หน้าแรก redirect ไปหน้า login
-app.get("/", (req, res) => {
-  res.redirect("/login");
-});
-
-// Error handler middleware (ควรอยู่ท้ายสุด)
+// Error handler middleware (ควรอยู่ท้ายสุดของ middleware/route)
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  // แสดงรายละเอียด error เฉพาะตอน dev
   res.status(500).send(process.env.NODE_ENV === 'production'
     ? 'Something went wrong!'
     : `Error: ${err.message}<br><pre>${err.stack}</pre>`);
 });
-   
+
+// เพิ่มการ setup ฐานข้อมูลเบื้องต้น
+const { createUsersTable } = require('./setup/createDatabase');
+
+// Setup database เมื่อเริ่มต้น server
+createUsersTable().catch(console.error);
+
+// start server
+app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
